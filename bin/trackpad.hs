@@ -22,7 +22,7 @@ import Data.Default  ( def )
 
 -- fluffy ------------------------------
 
-import Fluffy.MonadIO  ( MonadIO, eitherIOThrowT, liftIO, say, warn )
+import Fluffy.MonadIO  ( eitherIOThrowT, warn )
 import Fluffy.Nat      ( One, atMostOne )
 import Fluffy.Options  ( optParser )
 
@@ -95,13 +95,8 @@ parseOpts = Options <$> (enableParser Enable <|> enableParser Disable)
                     <*> (VerboseLevel <$> atMostOne flagVerbose)
                     <*> (DryRunLevel  <$> atMostOne flagDryRun)
 
-
-foo :: MonadIO μ => μ ()
-foo = do
-  liftIO $ say ("hello, world!" :: Text)
-
 main :: IO ()
-main = {- runProc_ $ -} do
+main = do
   opts <- optParser "enable/disable trackpad" parseOpts
 
   ((o,""),_) <- eitherIOThrowT $ runProcess opts $ capture' def NoStream (CmdSpec xinput [ "--list", "--name-only" ])
